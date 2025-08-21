@@ -10,50 +10,60 @@ usuarios = [
     {"id": 2, "nombre": "Carlos"}
 ]
 
-# GET 
-#aqui
+# GET
 @app.get("/")
-def obtener_usuarios():
-    return str(usuarios)   # devolvemos como string
+def ver_usuarios():
+    # devolvemos la lista directamente
+    return usuarios
 
-# POST → Agregar un usuario (simulación, sin body)
+# POST
 @app.post("/add/<nombre>")
 def agregar_usuario(nombre):
-    nuevo = {
+    # el nuevo usuario será el siguiente número en la lista
+    nuevo_usuario = {
         "id": len(usuarios) + 1,
         "nombre": nombre
     }
-    usuarios.append(nuevo)
-    return f"Usuario agregado: {nuevo}"
+    usuarios.append(nuevo_usuario)
+    return {"mensaje": "Usuario agregado", "usuario": nuevo_usuario}
 
-# PUT → Modificar un usuario por id (simulación)
+# PUT
 @app.put("/update/<int:id>/<nuevo_nombre>")
-def modificar_usuario(id, nuevo_nombre):
-    for usuario in usuarios:
-        if usuario["id"] == id:
-            usuario["nombre"] = nuevo_nombre
-            return f"Usuario actualizado: {usuario}"
-    return "Usuario no encontrado"
+def cambiar_usuario(id, nuevo_nombre):
+    for u in usuarios:
+        if u["id"] == id:   # encontramos al usuario
+            u["nombre"] = nuevo_nombre
+            return {"mensaje": "Usuario actualizado", "usuario": u}
+    return {"error": "Usuario no encontrado"}
 
-# DELETE → Eliminar un usuario por id
+# DELETE 
 @app.delete("/delete/<int:id>")
-def eliminar_usuario(id):
-    global usuarios
-    usuarios = [u for u in usuarios if u["id"] != id]
-    return f"Usuario con id {id} eliminado"
+def borrar_usuario(id):
+    # recorremos cada usuario de la lista
+    for usuario in usuarios:
+        if usuario["id"] == id:   # si el id coincide se elimina 
+            usuarios.remove(usuario) 
+            return {"mensaje": "Usuario eliminado", "id": id}
+    
+    # si no se encontró
+    return {"mensaje": "Ese usuario no existe"}
+
+
 
 # Evitar fire 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=50000)
 
 #GET: VER USUARIOS:
-#http://localhost:5000/
+#curl.exe http://127.0.0.1:50000/
 
 #POST: AGREGAR UN USUARIO
-#http://localhost:5000/
+#curl.exe -X POST http://127.0.0.1:50000/add/Pedro
+
 
 #PUT: MODIFICAR UN USUARIO POR ID
-#http://localhost:5000/update/1/Luis
+#curl.exe -X PUT http://127.0.0.1:50000/update/2/Natalia
+
 
 #DELETE: ELIMINAR USUARIO POR ID
-#http://localhost:5000/delete/2
+#curl.exe -X DELETE  http://127.0.0.1:50000/delete/3
